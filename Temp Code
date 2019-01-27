@@ -1,0 +1,41 @@
+Sub stocks()
+
+' Dim Total_Volume As Long
+' Dim Open_To_Closing As Long
+' Dim Ticker As String
+
+    Dim tickers()
+' tickers(0) = Range("A2").Value
+    Dim i As Integer
+    Dim row As Integer
+    
+    
+    
+    row = 1
+    no_value = False
+    
+     While no_value = False
+            i = i + 1
+            row = row + 1
+            cell_a = "a" + CStr(i)
+            cell_b = "a" = CStr(i - 1)
+            
+            If IsEmpty(Range(cell_a)) Then
+                no_value = True
+                
+            ElseIf Range(cell_a) <> Range(cell_b) Then
+                Range(cell_a).Value = "Hi"
+                Range(cell_a).Value
+                
+            End If
+     Wend
+     
+     
+ 
+
+
+' Total_Volume =
+' Open_To_Closing =
+' Ticker =
+
+End Sub
