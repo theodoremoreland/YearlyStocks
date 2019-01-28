@@ -1,41 +1,69 @@
+'Create a script that will loop through all the stocks and take the following info.
+'
+'
+'Yearly change from what the stock opened the year at to what the closing price was.
+'The percent change from the what it opened the year at to what it closed.
+'The total Volume of the stock
+'Ticker Symbol
+'
+'
+'You should also have conditional formatting that will highlight positive change in green and negative change in red.
+
 Sub stocks()
 
-' Dim Total_Volume As Long
-' Dim Open_To_Closing As Long
-' Dim Ticker As String
-
-    Dim tickers()
-' tickers(0) = Range("A2").Value
-    Dim i As Integer
-    Dim row As Integer
+     Dim tickers(), size As Long, i As Long
+     size = WorksheetFunction.CountA(Worksheets("A").Columns(1))
+     ReDim tickers(size)
+     Dim index As Long
+     Dim k As Long
+     no_value = False
     
-    
-    
-    row = 1
-    no_value = False
-    
+     ' will loop through each row in cloumn "A" until the loop lands on a cell without a value
+     ' so long as the cell does have a value, this procedure will compare the current cell value to the last cell value
+     ' if the current cell value is not the same as the previous cell value, the procedure will add the current cell value
+     ' to the tickers' array. Then the procedure will increment the index variable + 1.
      While no_value = False
-            i = i + 1
-            row = row + 1
+            ' conditional to ensure index starts at 0 then increments after one loop with the value 0.
+            If index > 0 Then
+                index = index
+            Else
+                index = 0
+            End If
+            ' conditional to ensure i starts at 2 then increments after one loop with the value 2.
+            If i < 2 Then
+                i = 2
+            Else
+                i = i + 1
+            End If
+            ' the variables "cell_a" and "cell_b" are being used as a replacement for the the function "Cells.(i, a).Value"...
+            ' ...because I can't get the function "Cells.Value" to work properly
             cell_a = "a" + CStr(i)
-            cell_b = "a" = CStr(i - 1)
+            cell_b = "a" + CStr(i - 1)
             
             If IsEmpty(Range(cell_a)) Then
                 no_value = True
                 
-            ElseIf Range(cell_a) <> Range(cell_b) Then
-                Range(cell_a).Value = "Hi"
-                Range(cell_a).Value
+            ElseIf Range(cell_a).Value <> Range(cell_b).Value Then
+                tickers(index) = Range(cell_a).Value
+                index = index + 1
                 
             End If
      Wend
      
-     
- 
-
-
-' Total_Volume =
-' Open_To_Closing =
-' Ticker =
+    
+     'will loop through tickers' array then insert each element into column:"I".
+     ' j is the increment for each row and k increments through the tickers' array.
+     For j = 2 To size
+            If k > 0 Then
+                k = k
+            Else
+                k = 0
+            End If
+            
+            cell_i = "i" + CStr(j)
+            Range(cell_i).Value = tickers(k)
+            k = k + 1
+     Next j
+        
 
 End Sub
