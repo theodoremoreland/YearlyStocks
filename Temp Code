@@ -1,14 +1,3 @@
-'Create a script that will loop through all the stocks and take the following info.
-'
-'
-'Yearly change from what the stock opened the year at to what the closing price was.
-'The percent change from the what it opened the year at to what it closed.
-'The total Volume of the stock
-'Ticker Symbol
-'
-'
-'You should also have conditional formatting that will highlight positive change in green and negative change in red.
-
 Sub stocks()
      'creates and sizes array to store tickers.
      '...because the number of used cells in column:1 far exceeds the number of tickers...
@@ -109,17 +98,8 @@ Sub stocks()
     'continue looping until looping through every element in tickers' array unless finding an empty element, in which case: exit
     Next index2
     
-    'find max volume using worksheet function
-    'find highest percentage using worksheet function
-    'find lowest percentage using worksheet function
     
-    'ticker set 2 = column:i
-    'greatest % increase = p2:q2
-    'greatest % decrease = p3:q3
-    'greatest volume = p4:q4
-    'tickers = column p, value = column q
-    
-    size2 = WorksheetFunction.CountA(Worksheets("Test").Columns("i"))
+    size2 = WorksheetFunction.CountA(Worksheets("Test").Columns("i")) 'size of new ticker column
     max_per = WorksheetFunction.Max(Worksheets("Test").Columns("k"))
     min_per = WorksheetFunction.Min(Worksheets("Test").Columns("k"))
     max_vol = WorksheetFunction.Max(Worksheets("Test").Columns("l"))
@@ -128,10 +108,11 @@ Sub stocks()
     Range("Q3").Value = FormatPercent(min_per)
     Range("Q4").Value = max_vol
     
+    'loops through columns i,k, and l. If either column k or l contains min or max values, apply ticker to appropriate cell
     For index4 = 2 To size2 + 2
-        aticker = "i" + CStr(index4)
-        ck = "k" + CStr(index4)
-        cl = "l" + CStr(index4)
+        aticker = "i" + CStr(index4) 'ticker
+        ck = "k" + CStr(index4) 'percent change
+        cl = "l" + CStr(index4) 'volume
         If max_per = Range(ck).Value Then
             Range("P2").Value = Range(aticker).Value
         ElseIf min_per = Range(ck).Value Then
@@ -141,6 +122,15 @@ Sub stocks()
         End If
     Next index4
     
-    'Range("l:l").
+    'loops through "yearly change" column then applies either green or red interior
+    For index5 = 2 To arrNum + 2
+        cj = "j" + CStr(index5)
+        If IsEmpty(Range(cj).Value) Then Exit For
+        If Range(cj).Value > 0 Then
+            Range(cj).Interior.ColorIndex = 4
+        Else
+            Range(cj).Interior.ColorIndex = 3
+        End If
+    Next index5
 
 End Sub
