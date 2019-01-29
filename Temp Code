@@ -10,13 +10,14 @@
 'You should also have conditional formatting that will highlight positive change in green and negative change in red.
 
 Sub stocks()
-     'creates and sizes array to store tickers...
+     'creates and sizes array to store tickers.
      '...because the number of used cells in column:1 far exceeds the number of tickers...
      '...the size argument will create a lot of elements that never get assigned values...
-     '...the elements without values must later be bypassed and ignored to prevent breaking code
+     '...the elements without values must later be bypassed and ignored to prevent breaking code (see third for loop)
      Dim tickers(), size As Long, i As Long
      size = WorksheetFunction.CountA(Worksheets("Test").Columns(1))
      ReDim tickers(size)
+     arrNum = UBound(tickers)
      
      'variables used in various loops throughout this macro
      
@@ -70,8 +71,7 @@ Sub stocks()
             k = k + 1
      Next j
      
-     'initialize variable with number equivalent to the number of items in the tickers' array
-     arrNum = UBound(tickers)
+
      'loop once for every element in the tickers' array
      For index2 = 0 To arrNum
         'once the tickers' index reach an empty element, exit the for loop
@@ -79,9 +79,9 @@ Sub stocks()
         opening = 0
         closing = 0
         volume = 0
-        cell_j = "j" + CStr(index2 + 2)
-        cell_k = "k" + CStr(index2 + 2)
-        cell_L = "l" + CStr(index2 + 2)
+        cell_j = "j" + CStr(index2 + 2) 'yearly change
+        cell_k = "k" + CStr(index2 + 2) 'percent change
+        cell_L = "l" + CStr(index2 + 2) 'total volume
         'loop once for every row in columns a,c, f, and g.
         For index3 = 2 To size - 1
             cell_a = "a" + CStr(index3) 'ticker
@@ -108,6 +108,39 @@ Sub stocks()
         Range(cell_k).Value = FormatPercent(percent_increase)
     'continue looping until looping through every element in tickers' array unless finding an empty element, in which case: exit
     Next index2
-            
+    
+    'find max volume using worksheet function
+    'find highest percentage using worksheet function
+    'find lowest percentage using worksheet function
+    
+    'ticker set 2 = column:i
+    'greatest % increase = p2:q2
+    'greatest % decrease = p3:q3
+    'greatest volume = p4:q4
+    'tickers = column p, value = column q
+    
+    size2 = WorksheetFunction.CountA(Worksheets("Test").Columns("i"))
+    max_per = WorksheetFunction.Max(Worksheets("Test").Columns("k"))
+    min_per = WorksheetFunction.Min(Worksheets("Test").Columns("k"))
+    max_vol = WorksheetFunction.Max(Worksheets("Test").Columns("l"))
+    
+    Range("Q2").Value = FormatPercent(max_per)
+    Range("Q3").Value = FormatPercent(min_per)
+    Range("Q4").Value = max_vol
+    
+    For index4 = 2 To size2 + 2
+        aticker = "i" + CStr(index4)
+        ck = "k" + CStr(index4)
+        cl = "l" + CStr(index4)
+        If max_per = Range(ck).Value Then
+            Range("P2").Value = Range(aticker).Value
+        ElseIf min_per = Range(ck).Value Then
+            Range("P3").Value = Range(aticker).Value
+        ElseIf max_vol = Range(cl).Value Then
+            Range("P4").Value = Range(aticker).Value
+        End If
+    Next index4
+    
+    'Range("l:l").
 
 End Sub
