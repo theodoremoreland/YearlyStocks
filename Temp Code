@@ -10,17 +10,20 @@
 'You should also have conditional formatting that will highlight positive change in green and negative change in red.
 
 Sub stocks()
-
+     'creates and sizes array to store tickers...
+     '...because the number of used cells in column:1 far exceeds the number of tickers...
+     '...the size argument will create a lot of elements that never get assigned values...
+     '...the elements without values must later be bypassed and ignored to prevent breaking code
      Dim tickers(), size As Long, i As Long
      size = WorksheetFunction.CountA(Worksheets("Test").Columns(1))
      ReDim tickers(size)
      
+     'variables used in various loops throughout this macro
      
      Dim index As Long
      Dim index2 As Long
      Dim k As Long
      no_value = False
-     'opening = c, closing = f, ticker = a, volume = g
      
     
      ' will loop through each row in cloumn "A" until the loop lands on a cell without a value
@@ -28,13 +31,13 @@ Sub stocks()
      ' if the current cell value is not the same as the previous cell value, the procedure will add the current cell value
      ' to the tickers' array. Then the procedure will increment the index variable + 1.
      While no_value = False
-            ' conditional to ensure index starts at 0 then increments after one loop with the value 0.
+            ' conditional to ensure index starts at 0 before incrementing.
             If index > 0 Then
                 index = index
             Else
                 index = 0
             End If
-            ' conditional to ensure i starts at 2 then increments after one loop with the value 2.
+            ' conditional to ensure i starts at 2 before incrementing.
             If i < 2 Then
                 i = 2
             Else
@@ -47,17 +50,14 @@ Sub stocks()
             
             If IsEmpty(Range(cell_a)) Then
                 no_value = True
-                
             ElseIf Range(cell_a).Value <> Range(cell_b).Value Then
                 tickers(index) = Range(cell_a).Value
                 index = index + 1
-                
             End If
      Wend
      
-    
      'will loop through tickers' array then insert each element into column:"I".
-     ' j is the increment for each row and k increments through the tickers' array.
+     '"j" is the increment for each row and "k" increments through the tickers' array.
      For j = 2 To size
             If k > 0 Then
                 k = k
@@ -70,27 +70,43 @@ Sub stocks()
             k = k + 1
      Next j
      
-     'for loop the ticker index
-     'for loop the rows
-     'while loop the index = rows
-     'increment rows
-     'increment index
+     'initialize variable with number equivalent to the number of items in the tickers' array
      arrNum = UBound(tickers)
+     'loop once for every element in the tickers' array
      For index2 = 0 To arrNum
+        'once the tickers' index reach an empty element, exit the for loop
         If IsEmpty(tickers(index2)) Then Exit For
         opening = 0
         closing = 0
+        volume = 0
         cell_j = "j" + CStr(index2 + 2)
+        cell_k = "k" + CStr(index2 + 2)
+        cell_L = "l" + CStr(index2 + 2)
+        'loop once for every row in columns a,c, f, and g.
         For index3 = 2 To size - 1
-            cell_a = "a" + CStr(index3)
-            cell_c = "c" + CStr(index3)
-            cell_f = "f" + CStr(index3)
+            cell_a = "a" + CStr(index3) 'ticker
+            cell_c = "c" + CStr(index3) 'opening
+            cell_f = "f" + CStr(index3) 'closing
+            cell_g = "g" + CStr(index3) 'volume
+            'if the ticker in (column:a, row:index3) is the same as the current ticker found in the tickers' array...
+            '...add the values of (column:c, row:index3) to the opening variable...
+            '...add the values of (column:f, row:index3) to the closing variable...
+            '...add the values of (column:g, row:index3) to the volume variable...
             If Range(cell_a).Value = tickers(index2) Then
                 opening = opening + Range(cell_c).Value
                 closing = closing + Range(cell_f).Value
+                volume = volume + Range(cell_g).Value
             End If
+        'continue looping until loop evaluates all rows per specified columns in the worksheet
         Next index3
+        'once completing a loop through all rows, subtract opening from closing to find yearly stock increase...
+        '...assigns yearly stock increase to cell:j and volume to cell:L
         Range(cell_j).Value = closing - opening
+        Range(cell_L).Value = volume
+        increase = closing - opening
+        percent_increase = increase / opening * 100
+        Range(cell_k).Value = FormatPercent(percent_increase)
+    'continue looping until looping through every element in tickers' array unless finding an empty element, in which case: exit
     Next index2
             
 
