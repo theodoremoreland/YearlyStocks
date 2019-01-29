@@ -4,7 +4,7 @@ Sub stocks()
      '...the size argument will create a lot of elements that never get assigned values...
      '...the elements without values must later be bypassed and ignored to prevent breaking code (see third for loop)
      Dim tickers(), size As Long, i As Long
-     size = WorksheetFunction.CountA(Worksheets("Test").Columns(1))
+     size = WorksheetFunction.CountA(Worksheets("A").Columns(1))
      ReDim tickers(size)
      arrNum = UBound(tickers)
      
@@ -99,10 +99,10 @@ Sub stocks()
     Next index2
     
     
-    size2 = WorksheetFunction.CountA(Worksheets("Test").Columns("i")) 'size of new ticker column
-    max_per = WorksheetFunction.Max(Worksheets("Test").Columns("k"))
-    min_per = WorksheetFunction.Min(Worksheets("Test").Columns("k"))
-    max_vol = WorksheetFunction.Max(Worksheets("Test").Columns("l"))
+    size2 = WorksheetFunction.CountA(Worksheets("A").Columns("i")) 'size of new ticker column
+    max_per = WorksheetFunction.Max(Worksheets("A").Columns("k"))
+    min_per = WorksheetFunction.Min(Worksheets("A").Columns("k"))
+    max_vol = WorksheetFunction.Max(Worksheets("A").Columns("l"))
     
     Range("Q2").Value = FormatPercent(max_per)
     Range("Q3").Value = FormatPercent(min_per)
