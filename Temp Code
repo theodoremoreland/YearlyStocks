@@ -12,11 +12,16 @@
 Sub stocks()
 
      Dim tickers(), size As Long, i As Long
-     size = WorksheetFunction.CountA(Worksheets("A").Columns(1))
+     size = WorksheetFunction.CountA(Worksheets("Test").Columns(1))
      ReDim tickers(size)
+     
+     
      Dim index As Long
+     Dim index2 As Long
      Dim k As Long
      no_value = False
+     'opening = c, closing = f, ticker = a, volume = g
+     
     
      ' will loop through each row in cloumn "A" until the loop lands on a cell without a value
      ' so long as the cell does have a value, this procedure will compare the current cell value to the last cell value
@@ -35,8 +40,8 @@ Sub stocks()
             Else
                 i = i + 1
             End If
-            ' the variables "cell_a" and "cell_b" are being used as a replacement for the the function "Cells.(i, a).Value"...
-            ' ...because I can't get the function "Cells.Value" to work properly
+            ' the variables "cell_a" and "cell_b" are being used as a replacement for the the function "Cells(i, a).Value"...
+            ' ...because I can't get the function "Cells().Value" to work properly
             cell_a = "a" + CStr(i)
             cell_b = "a" + CStr(i - 1)
             
@@ -64,6 +69,29 @@ Sub stocks()
             Range(cell_i).Value = tickers(k)
             k = k + 1
      Next j
-        
+     
+     'for loop the ticker index
+     'for loop the rows
+     'while loop the index = rows
+     'increment rows
+     'increment index
+     arrNum = UBound(tickers)
+     For index2 = 0 To arrNum
+        If IsEmpty(tickers(index2)) Then Exit For
+        opening = 0
+        closing = 0
+        cell_j = "j" + CStr(index2 + 2)
+        For index3 = 2 To size - 1
+            cell_a = "a" + CStr(index3)
+            cell_c = "c" + CStr(index3)
+            cell_f = "f" + CStr(index3)
+            If Range(cell_a).Value = tickers(index2) Then
+                opening = opening + Range(cell_c).Value
+                closing = closing + Range(cell_f).Value
+            End If
+        Next index3
+        Range(cell_j).Value = closing - opening
+    Next index2
+            
 
 End Sub
