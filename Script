@@ -1,20 +1,20 @@
-Sub stocks()
+Sub stocks_hard()
      'creates and sizes array to store tickers.
      '...because the number of used cells in column:1 far exceeds the number of tickers...
      '...the size argument will create a lot of elements that never get assigned values...
-     '...the elements without values must later be bypassed and ignored to prevent breaking code (see third "for loop")
-     Dim tickers(), size As Long, i As Long
+     '...the elements without values must later be bypassed and ignored to prevent breaking code (see third for loop)
+     Dim tickers(), size As Double, i As Double
      size = WorksheetFunction.CountA(ActiveSheet.Columns(1))
      ReDim tickers(size)
      arrNum = UBound(tickers)
      
      'variables used in various loops throughout this macro
-     
-     Dim index As Long
-     Dim k As Long
+     Dim year_opening As Double, year_closing As Double
+     Dim index As Double
+     Dim index2 As Double
+     Dim k As Double
      no_value = False
      
-    
      ' will loop through each row in cloumn "A" until the loop lands on a cell without a value
      ' so long as the cell does have a value, this procedure will compare the current cell value to the last cell value
      ' if the current cell value is not the same as the previous cell value, the procedure will add the current cell value
@@ -33,7 +33,7 @@ Sub stocks()
                 i = i + 1
             End If
             ' the variables "cell_a" and "cell_b" are being used as a replacement for the the function "Cells(i, a).Value"...
-            ' ...because I can't get the function "Cells().Value" to work properly
+            ' ...because I can't get the function "Cells().Value" to work properly.
             cell_a = "a" + CStr(i)
             cell_b = "a" + CStr(i - 1)
             
@@ -44,7 +44,7 @@ Sub stocks()
                 index = index + 1
             End If
      Wend
-     
+    
      'will loop through tickers' array then insert each element into column:"I".
      '"j" is the increment for each row and "k" increments through the tickers' array.
      For j = 2 To size
@@ -53,7 +53,6 @@ Sub stocks()
             Else
                 k = 0
             End If
-            
             cell_i = "i" + CStr(j)
             Range(cell_i).Value = tickers(k)
             k = k + 1
@@ -64,38 +63,43 @@ Sub stocks()
      For index2 = 0 To arrNum
         'once the tickers' index reach an empty element, exit the for loop
         If IsEmpty(tickers(index2)) Then Exit For
-        opening = 0
-        closing = 0
         volume = 0
         cell_j = "j" + CStr(index2 + 2) 'yearly change
         cell_k = "k" + CStr(index2 + 2) 'percent change
         cell_L = "l" + CStr(index2 + 2) 'total volume
         'loop once for every row in columns a,c, f, and g.
-        For index3 = 2 To size - 1
+        For index3 = 2 To size + 1
             cell_a = "a" + CStr(index3) 'ticker
+            cell_a2 = "a" + CStr(index3 + 1)
             cell_c = "c" + CStr(index3) 'opening
+            cell_c2 = "c" + CStr(index3 + 1)
             cell_f = "f" + CStr(index3) 'closing
             cell_g = "g" + CStr(index3) 'volume
-            'if the ticker in (column:a, row:index3) is the same as the current ticker found in the tickers' array...
-            '...add the values of (column:c, row:index3) to the opening variable...
-            '...add the values of (column:f, row:index3) to the closing variable...
-            '...add the values of (column:g, row:index3) to the volume variable...
+            '--------------------------------------------
+            If index3 = 2 And Range(cell_a).Value = tickers(index2) Then
+                year_opening = Range(cell_c).Value
+            End If
+            '--------------------------------------------
+            If Range(cell_a) <> Range(cell_a2).Value And Range(cell_a).Value = tickers(index2) Then
+                year_closing = Range(cell_f).Value
+            End If
+            '--------------------------------------------
             If Range(cell_a).Value = tickers(index2) Then
-                opening = opening + Range(cell_c).Value
-                closing = closing + Range(cell_f).Value
                 volume = volume + Range(cell_g).Value
             End If
+            
         'continue looping until loop evaluates all rows per specified columns in the worksheet
         Next index3
         'once completing a loop through all rows, subtract opening from closing to find yearly stock increase...
         '...assigns yearly stock increase to cell:j and volume to cell:L
-        Range(cell_j).Value = closing - opening
+        Range(cell_j).Value = year_closing - year_opening
         Range(cell_L).Value = volume
-        increase = closing - opening
-        percent_increase = increase / opening * 100
+        increase = year_closing - year_opening
+        percent_increase = increase / year_opening
         Range(cell_k).Value = FormatPercent(percent_increase)
-    'continue looping until looping through every element in tickers' array unless finding an empty element, in which case: exit
+    'continue looping until looping through every element in tickers' array
     Next index2
+    
     
     size2 = WorksheetFunction.CountA(ActiveSheet.Columns("i")) 'size of new ticker column
     max_per = WorksheetFunction.Max(ActiveSheet.Columns("k"))
