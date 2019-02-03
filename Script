@@ -1,107 +1,63 @@
-Sub stocks_hard()
-     'creates and sizes array to store tickers.
-     '...because the number of used cells in column:1 far exceeds the number of tickers...
-     '...the size argument will create a lot of elements that never get assigned values...
-     '...the elements without values must later be bypassed and ignored to prevent breaking code (see third for loop)
-     Dim tickers(), size As Double, i As Double
-     size = WorksheetFunction.CountA(ActiveSheet.Columns(1))
-     ReDim tickers(size)
-     arrNum = UBound(tickers)
-     
-     'variables used in various loops throughout this macro
-     Dim year_opening As Double, year_closing As Double
-     Dim index As Double
-     Dim index2 As Double
-     Dim k As Double
-     no_value = False
-     
-     ' will loop through each row in cloumn "A" until the loop lands on a cell without a value
-     ' so long as the cell does have a value, this procedure will compare the current cell value to the last cell value
-     ' if the current cell value is not the same as the previous cell value, the procedure will add the current cell value
-     ' to the tickers' array. Then the procedure will increment the index variable + 1.
-     While no_value = False
-            ' conditional to ensure index starts at 0 before incrementing.
-            If index > 0 Then
-                index = index
-            Else
-                index = 0
-            End If
-            ' conditional to ensure i starts at 2 before incrementing.
-            If i < 2 Then
-                i = 2
-            Else
-                i = i + 1
-            End If
-            ' the variables "cell_a" and "cell_b" are being used as a replacement for the the function "Cells(i, a).Value"...
-            ' ...because I can't get the function "Cells().Value" to work properly.
-            cell_a = "a" + CStr(i)
-            cell_b = "a" + CStr(i - 1)
-            
-            If IsEmpty(Range(cell_a)) Then
-                no_value = True
-            ElseIf Range(cell_a).Value <> Range(cell_b).Value Then
-                tickers(index) = Range(cell_a).Value
-                index = index + 1
-            End If
-     Wend
-    
-     'will loop through tickers' array then insert each element into column:"I".
-     '"j" is the increment for each row and "k" increments through the tickers' array.
-     For j = 2 To size
-            If k > 0 Then
-                k = k
-            Else
-                k = 0
-            End If
-            cell_i = "i" + CStr(j)
-            Range(cell_i).Value = tickers(k)
-            k = k + 1
-     Next j
-     
+Sub stocks_hard3()
 
-     'loop once for every element in the tickers' array
-     For index2 = 0 To arrNum
-        'once the tickers' index reach an empty element, exit the for loop
-        If IsEmpty(tickers(index2)) Then Exit For
-        volume = 0
-        cell_j = "j" + CStr(index2 + 2) 'yearly change
-        cell_k = "k" + CStr(index2 + 2) 'percent change
-        cell_L = "l" + CStr(index2 + 2) 'total volume
-        'loop once for every row in columns a,c, f, and g.
-        For index3 = 2 To size + 1
-            cell_a = "a" + CStr(index3) 'ticker
-            cell_a2 = "a" + CStr(index3 + 1)
-            cell_c = "c" + CStr(index3) 'opening
-            cell_c2 = "c" + CStr(index3 + 1)
-            cell_f = "f" + CStr(index3) 'closing
-            cell_g = "g" + CStr(index3) 'volume
-            '--------------------------------------------
-            If index3 = 2 And Range(cell_a).Value = tickers(index2) Then
-                year_opening = Range(cell_c).Value
-            End If
-            '--------------------------------------------
-            If Range(cell_a) <> Range(cell_a2).Value And Range(cell_a).Value = tickers(index2) Then
-                year_closing = Range(cell_f).Value
-            End If
-            '--------------------------------------------
-            If Range(cell_a).Value = tickers(index2) Then
-                volume = volume + Range(cell_g).Value
-            End If
-            
-        'continue looping until loop evaluates all rows per specified columns in the worksheet
-        Next index3
-        'once completing a loop through all rows, subtract opening from closing to find yearly stock increase...
-        '...assigns yearly stock increase to cell:j and volume to cell:L
-        Range(cell_j).Value = year_closing - year_opening
-        Range(cell_L).Value = volume
-        increase = year_closing - year_opening
-        percent_increase = increase / year_opening
-        Range(cell_k).Value = FormatPercent(percent_increase)
-    'continue looping until looping through every element in tickers' array
-    Next index2
+    Dim select_index As Double
+    Dim first_row As Double
+    Dim select_row As Double
+    Dim last_row As Double
+    Dim year_opening As Single
+    Dim year_closing As Single
+    Dim volume As Double
+    select_index = 2
+    first_row = 2
+    select_row = 2
+    last_row = WorksheetFunction.CountA(ActiveSheet.Columns(1))
+    volume = 0
     
+    'loop through all rows to find unique tickers, then place each unique ticker in 9th column
+    For i = first_row To last_row
+        tickers = Cells(i, 1).Value
+        tickers2 = Cells(i - 1, 1).Value
+        If tickers <> tickers2 Then
+            Cells(select_row, 9).Value = tickers
+            select_row = select_row + 1
+        End If
+     Next i
+
+    'loop through all rows and add to volume if the ticker hasn't changed. Once ticker has changed, reset volume and continue.
+    For i = first_row To last_row + 1
+        tickers = Cells(i, 1).Value
+        tickers2 = Cells(i - 1, 1).Value
+        If tickers = tickers2 And i > 2 Then
+            volume = volume + Cells(i, 7).Value
+        ElseIf i > 2 Then
+            Cells(select_index, 12).Value = volume
+            select_index = select_index + 1
+            volume = 0
+        Else
+            volume = volume + Cells(i, 7).Value
+        End If
+    Next i
+        
+    'loop through all rows. If previous ticker is different, assign year_opening. If next ticker is different, assign year_closing.
+    select_index = 2
+    For i = first_row To last_row
+        If Cells(i, 1).Value <> Cells(i + 1, 1).Value Then
+            year_closing = Cells(i, 6).Value
+        ElseIf Cells(i, 1).Value <> Cells(i - 1, 1).Value Then
+            year_opening = Cells(i, 3).Value
+        End If
+        If year_opening > 0 And year_closing > 0 Then
+            increase = year_closing - year_opening
+            percent_increase = increase / year_opening
+            Cells(select_index, 10).Value = increase
+            Cells(select_index, 11).Value = FormatPercent(percent_increase)
+            year_closing = 0
+            year_opening = 0
+            select_index = select_index + 1
+        End If
+    Next i
     
-    size2 = WorksheetFunction.CountA(ActiveSheet.Columns("i")) 'size of new ticker column
+    'finds min and max values, then assigns each value to proper cell
     max_per = WorksheetFunction.Max(ActiveSheet.Columns("k"))
     min_per = WorksheetFunction.Min(ActiveSheet.Columns("k"))
     max_vol = WorksheetFunction.Max(ActiveSheet.Columns("l"))
@@ -110,29 +66,26 @@ Sub stocks_hard()
     Range("Q3").Value = FormatPercent(min_per)
     Range("Q4").Value = max_vol
     
-    'loops through columns i,k, and l. If either column k or l contains min or max values, apply ticker to appropriate cell
-    For index4 = 2 To size2 + 2
-        aticker = "i" + CStr(index4) 'ticker
-        ck = "k" + CStr(index4) 'percent change
-        cl = "l" + CStr(index4) 'volume
-        If max_per = Range(ck).Value Then
-            Range("P2").Value = Range(aticker).Value
-        ElseIf min_per = Range(ck).Value Then
-            Range("P3").Value = Range(aticker).Value
-        ElseIf max_vol = Range(cl).Value Then
-            Range("P4").Value = Range(aticker).Value
-        End If
-    Next index4
     
-    'loops through "yearly change" column then applies either green or red interior
-    For index5 = 2 To arrNum + 2
-        cj = "j" + CStr(index5)
-        If IsEmpty(Range(cj).Value) Then Exit For
-        If Range(cj).Value > 0 Then
-            Range(cj).Interior.ColorIndex = 4
-        Else
-            Range(cj).Interior.ColorIndex = 3
+    'loops through columns 11 & 12. If either column contains min or max values, apply corresponding ticker to corresponding cell
+    For i = first_row To last_row
+        If max_per = Cells(i, 11).Value Then
+            Range("P2").Value = Cells(i, 9).Value
+        ElseIf min_per = Cells(i, 11).Value Then
+            Range("P3").Value = Cells(i, 9).Value
+        ElseIf max_vol = Cells(i, 12).Value Then
+            Range("P4").Value = Cells(i, 9).Value
         End If
-    Next index5
-
+    Next i
+    
+    'loops through column 10 then applies either green or red interior
+    For i = first_row To last_row
+        If IsEmpty(Cells(i, 10).Value) Then Exit For
+        If Cells(i, 10).Value > 0 Then
+            Cells(i, 10).Interior.ColorIndex = 4
+        Else
+            Cells(i, 10).Interior.ColorIndex = 3
+        End If
+    Next i
+                
 End Sub
